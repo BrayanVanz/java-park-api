@@ -1,5 +1,7 @@
 package com.brayanvanz.park_api.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,5 +40,11 @@ public class UserController {
     public ResponseEntity<User> updatePassword(@PathVariable Long id, @RequestBody User user) {
         User updatedUser = userService.updatePassword(id, user.getPassword());
         return ResponseEntity.ok(updatedUser);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> findAll() {
+        List<User> users = userService.findAll();
+        return ResponseEntity.ok(users);
     }
 }

@@ -1,5 +1,7 @@
 package com.brayanvanz.park_api.services;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,5 +31,10 @@ public class UserService {
         User user = findById(id);
         user.setPassword(password);
         return user;
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }
