@@ -19,6 +19,7 @@ import com.brayanvanz.park_api.dtos.mappers.UserMapper;
 import com.brayanvanz.park_api.entities.User;
 import com.brayanvanz.park_api.services.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponseDto> save(@RequestBody UserSaveDto userSaveDto) {
+    public ResponseEntity<UserResponseDto> save(@Valid @RequestBody UserSaveDto userSaveDto) {
         User newUser = userService.save(UserMapper.toUser(userSaveDto));
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(newUser));
     }
