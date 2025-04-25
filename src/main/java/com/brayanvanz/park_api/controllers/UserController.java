@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.brayanvanz.park_api.dtos.UserPasswordDto;
 import com.brayanvanz.park_api.dtos.UserResponseDto;
 import com.brayanvanz.park_api.dtos.UserSaveDto;
 import com.brayanvanz.park_api.dtos.mappers.UserMapper;
@@ -40,9 +41,9 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<User> updatePassword(@PathVariable Long id, @RequestBody User user) {
-        User updatedUser = userService.updatePassword(id, user.getPassword());
-        return ResponseEntity.ok(updatedUser);
+    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @RequestBody UserPasswordDto userPasswordDto) {
+        userService.updatePassword(id, userPasswordDto.getCurrentPassword(), userPasswordDto.getNewPassword(), userPasswordDto.getConfirmPassword());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
