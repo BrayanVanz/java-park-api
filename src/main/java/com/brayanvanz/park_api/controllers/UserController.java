@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.brayanvanz.park_api.dtos.UserResponseDto;
+import com.brayanvanz.park_api.dtos.UserSaveDto;
+import com.brayanvanz.park_api.dtos.mappers.UserMapper;
 import com.brayanvanz.park_api.entities.User;
 import com.brayanvanz.park_api.services.UserService;
 
@@ -25,9 +28,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> save(@RequestBody User user) {
-        User newUser = userService.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+    public ResponseEntity<UserResponseDto> save(@RequestBody UserSaveDto userSaveDto) {
+        User newUser = userService.save(UserMapper.toUser(userSaveDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(newUser));
     }
 
     @GetMapping("/{id}")
