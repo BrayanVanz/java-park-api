@@ -2,10 +2,12 @@ package com.brayanvanz.park_api.services;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.brayanvanz.park_api.entities.User;
+import com.brayanvanz.park_api.exceptions.UsernameUniqueViolationException;
 import com.brayanvanz.park_api.repositories.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,11 @@ public class UserService {
 
     @Transactional
     public User save(User user) {
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException ex) {
+            throw new UsernameUniqueViolationException(String.format("Username {%s} is already registered", user.getUsername()));
+        }
     }
 
     @Transactional(readOnly = true)
