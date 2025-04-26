@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.brayanvanz.park_api.entities.User;
+import com.brayanvanz.park_api.exceptions.EntityNotFoundException;
 import com.brayanvanz.park_api.exceptions.UsernameUniqueViolationException;
 import com.brayanvanz.park_api.repositories.UserRepository;
 
@@ -29,7 +30,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User findById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format("User %d not found", id)));
     }
 
     @Transactional

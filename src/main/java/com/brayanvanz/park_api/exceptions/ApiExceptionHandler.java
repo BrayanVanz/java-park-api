@@ -15,6 +15,18 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorMessage> entityNotFoundException(RuntimeException ex,
+        HttpServletRequest request) {
+
+        log.error("API Error - ", ex);
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorMessage(request, HttpStatus.NOT_FOUND, ex.getMessage()));
+    }
+
     @ExceptionHandler(UsernameUniqueViolationException.class)
     public ResponseEntity<ErrorMessage> usernameUniqueViolationException(RuntimeException ex,
         HttpServletRequest request) {
