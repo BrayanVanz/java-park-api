@@ -138,4 +138,34 @@ public class UserIT {
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(409);
     }
+
+    @Test
+    public void findById_ExistentId_ReturnUserStatus200() {
+        UserResponseDto responseBody = webTestClient
+            .get()
+            .uri("/api/v1/users/100")
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(UserResponseDto.class)
+            .returnResult().getResponseBody();
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getId()).isEqualTo(100);
+        Assertions.assertThat(responseBody.getUsername()).isEqualTo("joey@gmail.com");
+        Assertions.assertThat(responseBody.getRole()).isEqualTo(Role.ADMIN);
+    }
+
+    @Test
+    public void findById_NonExistentId_ReturnUserStatus404() {
+        ErrorMessage responseBody = webTestClient
+            .get()
+            .uri("/api/v1/users/0")
+            .exchange()
+            .expectStatus().isNotFound()
+            .expectBody(ErrorMessage.class)
+            .returnResult().getResponseBody();
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
 }
