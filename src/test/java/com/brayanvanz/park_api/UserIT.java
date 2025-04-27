@@ -1,5 +1,7 @@
 package com.brayanvanz.park_api;
 
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -266,5 +268,19 @@ public class UserIT {
         
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
+    }
+
+    @Test
+    public void findAll_NoParameters_ReturnUsersListStatus200() {
+        List<UserResponseDto> responseBody = webTestClient
+            .get()
+            .uri("/api/v1/users")
+            .exchange()
+            .expectStatus().isOk()
+            .expectBodyList(UserResponseDto.class)
+            .returnResult().getResponseBody();
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.size()).isEqualTo(3);
     }
 }
