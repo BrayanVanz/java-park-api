@@ -74,6 +74,8 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Incorrect password information",
                 content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
             @ApiResponse(responseCode = "404", description = "Resource not found",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+            @ApiResponse(responseCode = "422", description = "Invalid input data",
                 content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
         }
     )

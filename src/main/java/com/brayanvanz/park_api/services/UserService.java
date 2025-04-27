@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.brayanvanz.park_api.entities.User;
 import com.brayanvanz.park_api.exceptions.EntityNotFoundException;
+import com.brayanvanz.park_api.exceptions.PasswordInvalidException;
 import com.brayanvanz.park_api.exceptions.UsernameUniqueViolationException;
 import com.brayanvanz.park_api.repositories.UserRepository;
 
@@ -36,12 +37,12 @@ public class UserService {
     @Transactional
     public User updatePassword(Long id, String currentPassword, String newPassword, String confirmPassword) {
         if (!newPassword.equals(confirmPassword)) {
-            throw new RuntimeException("New password must equal the confirmed password");
+            throw new PasswordInvalidException("New password must equal the confirmed password");
         }
 
         User user = findById(id);
         if (!user.getPassword().equals(currentPassword)) {
-            throw new RuntimeException("Wrong password");
+            throw new PasswordInvalidException("Wrong password");
         }
 
         user.setPassword(newPassword);

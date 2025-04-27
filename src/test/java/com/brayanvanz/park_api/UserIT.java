@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import com.brayanvanz.park_api.dtos.UserPasswordDto;
 import com.brayanvanz.park_api.dtos.UserResponseDto;
 import com.brayanvanz.park_api.dtos.UserSaveDto;
 import com.brayanvanz.park_api.enums.Role;
@@ -167,5 +168,103 @@ public class UserIT {
         
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void updatePassword_ValidPassword_ReturnStatus204() {
+        webTestClient
+            .patch()
+            .uri("/api/v1/users/100")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UserPasswordDto("123456", "123456", "123456"))
+            .exchange()
+            .expectStatus().isNoContent();
+    }
+
+    @Test
+    public void updatePassword_NonExistentId_ReturnErrorMessageStatus404() {
+        ErrorMessage responseBody = webTestClient
+            .patch()
+            .uri("/api/v1/users/0")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UserPasswordDto("123456", "123456", "123456"))
+            .exchange()
+            .expectStatus().isNotFound()
+            .expectBody(ErrorMessage.class)
+            .returnResult().getResponseBody();
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    public void updatePassword_InvalidFields_ReturnErrorMessageStatus422() {
+        ErrorMessage responseBody = webTestClient
+            .patch()
+            .uri("/api/v1/users/100")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UserPasswordDto("", "", ""))
+            .exchange()
+            .expectStatus().isEqualTo(422)
+            .expectBody(ErrorMessage.class)
+            .returnResult().getResponseBody();
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody = webTestClient
+            .patch()
+            .uri("/api/v1/users/100")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UserPasswordDto("12345", "12345", "12345"))
+            .exchange()
+            .expectStatus().isEqualTo(422)
+            .expectBody(ErrorMessage.class)
+            .returnResult().getResponseBody();
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody = webTestClient
+            .patch()
+            .uri("/api/v1/users/100")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UserPasswordDto("12345678", "12345678", "12345678"))
+            .exchange()
+            .expectStatus().isEqualTo(422)
+            .expectBody(ErrorMessage.class)
+            .returnResult().getResponseBody();
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+    }
+
+    @Test
+    public void updatePassword_InvalidPassword_ReturnErrorMessageStatus400() {
+        ErrorMessage responseBody = webTestClient
+            .patch()
+            .uri("/api/v1/users/100")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UserPasswordDto("123456", "123456", "000000"))
+            .exchange()
+            .expectStatus().isEqualTo(400)
+            .expectBody(ErrorMessage.class)
+            .returnResult().getResponseBody();
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
+
+        responseBody = webTestClient
+            .patch()
+            .uri("/api/v1/users/100")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UserPasswordDto("000000", "123456", "123456"))
+            .exchange()
+            .expectStatus().isEqualTo(400)
+            .expectBody(ErrorMessage.class)
+            .returnResult().getResponseBody();
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
     }
 }
