@@ -97,6 +97,7 @@ public class UserController {
         }
     )
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<UserResponseDto>> findAll() {
         List<User> users = userService.findAll();
         return ResponseEntity.ok(UserMapper.toListDto(users));
