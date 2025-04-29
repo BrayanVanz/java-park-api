@@ -3,10 +3,17 @@ package com.brayanvanz.park_api.entities;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.brayanvanz.park_api.enums.Role;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +29,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)
 public class User implements Serializable {
 
     @Id
@@ -38,15 +46,19 @@ public class User implements Serializable {
     @Column(nullable = false, length = 25)
     private Role role = Role.CLIENT;
 
+    @CreatedDate
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
+    @LastModifiedDate
     @Column(name = "modification_date")
     private LocalDateTime modificationDate;
 
+    @CreatedBy
     @Column(name = "created_by")
     private String createdBy;
 
+    @LastModifiedBy
     @Column(name = "modified_by")
     private String modifiedBy;
 
