@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.brayanvanz.park_api.entities.User;
+import com.brayanvanz.park_api.enums.Role;
 import com.brayanvanz.park_api.exceptions.EntityNotFoundException;
 import com.brayanvanz.park_api.exceptions.PasswordInvalidException;
 import com.brayanvanz.park_api.exceptions.UsernameUniqueViolationException;
@@ -52,5 +53,17 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+            () -> new EntityNotFoundException(String.format("User %s not found", username))
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Role findRoleByUsername(String username) {
+        return userRepository.findRoleByUsername(username);
     }
 }
