@@ -76,13 +76,10 @@ public class UserController {
     @Operation(summary = "Updates password", description = "Requires Bearer Token. Access restricted to own account", 
         security = @SecurityRequirement(name = "security"),
         responses = {
-            @ApiResponse(responseCode = "204", description = "Password successfully updated", 
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))),
+            @ApiResponse(responseCode = "204", description = "Password successfully updated"), 
             @ApiResponse(responseCode = "400", description = "Incorrect password information",
                 content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
             @ApiResponse(responseCode = "403", description = "User doesn't have permission to access resource",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
-            @ApiResponse(responseCode = "404", description = "Resource not found",
                 content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
             @ApiResponse(responseCode = "422", description = "Invalid input data",
                 content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
