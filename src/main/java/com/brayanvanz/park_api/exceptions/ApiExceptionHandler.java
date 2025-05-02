@@ -28,7 +28,7 @@ public class ApiExceptionHandler {
             .body(new ErrorMessage(request, HttpStatus.NOT_FOUND, ex.getMessage()));
     }
 
-    @ExceptionHandler(UsernameUniqueViolationException.class)
+    @ExceptionHandler({ UsernameUniqueViolationException.class, CpfUniqueViolationException.class })
     public ResponseEntity<ErrorMessage> usernameUniqueViolationException(RuntimeException ex,
         HttpServletRequest request) {
 
