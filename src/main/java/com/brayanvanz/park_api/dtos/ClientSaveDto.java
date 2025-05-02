@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class ClientCreateDto {
+public class ClientSaveDto {
 
     @NotBlank
     @Size(min = 5, max = 100)
