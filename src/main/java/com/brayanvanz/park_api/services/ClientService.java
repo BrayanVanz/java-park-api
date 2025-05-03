@@ -1,6 +1,8 @@
 package com.brayanvanz.park_api.services;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,5 +33,10 @@ public class ClientService {
         return clientRepository.findById(id).orElseThrow(
             () -> new EntityNotFoundException(String.format("Client %s not found", id))
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Client> findAll(Pageable pageable) {
+        return clientRepository.findAll(pageable);
     }
 }

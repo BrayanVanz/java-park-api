@@ -1,5 +1,7 @@
 package com.brayanvanz.park_api.controllers;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -74,5 +76,12 @@ public class ClientController {
     public ResponseEntity<ClientResponseDto> findById(@PathVariable Long id) {
         Client client = clientService.findById(id);
         return ResponseEntity.ok(ClientMapper.toDto(client));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Page<Client>> findAll(Pageable pageable) {
+        Page<Client> clients = clientService.findAll(pageable);
+        return ResponseEntity.ok(clients);
     }
 }
