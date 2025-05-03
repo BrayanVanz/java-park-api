@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.brayanvanz.park_api.dtos.ClientResponseDto;
 import com.brayanvanz.park_api.dtos.ClientSaveDto;
+import com.brayanvanz.park_api.dtos.PageableDto;
 import com.brayanvanz.park_api.dtos.mappers.ClientMapper;
+import com.brayanvanz.park_api.dtos.mappers.PageableMapper;
 import com.brayanvanz.park_api.entities.Client;
 import com.brayanvanz.park_api.exceptions.ErrorMessage;
 import com.brayanvanz.park_api.jwt.JwtUserDetails;
+import com.brayanvanz.park_api.repositories.projections.ClientProjection;
 import com.brayanvanz.park_api.services.ClientService;
 import com.brayanvanz.park_api.services.UserService;
 
@@ -80,8 +83,8 @@ public class ClientController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Page<Client>> findAll(Pageable pageable) {
-        Page<Client> clients = clientService.findAll(pageable);
-        return ResponseEntity.ok(clients);
+    public ResponseEntity<PageableDto<ClientProjection>> findAll(Pageable pageable) {
+        Page<ClientProjection> clients = clientService.findAll(pageable);
+        return ResponseEntity.ok(PageableMapper.toDto(clients));
     }
 }

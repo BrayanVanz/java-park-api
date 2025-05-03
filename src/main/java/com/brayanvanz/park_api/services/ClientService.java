@@ -10,6 +10,7 @@ import com.brayanvanz.park_api.entities.Client;
 import com.brayanvanz.park_api.exceptions.CpfUniqueViolationException;
 import com.brayanvanz.park_api.exceptions.EntityNotFoundException;
 import com.brayanvanz.park_api.repositories.ClientRepository;
+import com.brayanvanz.park_api.repositories.projections.ClientProjection;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +37,7 @@ public class ClientService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Client> findAll(Pageable pageable) {
-        return clientRepository.findAll(pageable);
+    public Page<ClientProjection> findAll(Pageable pageable) {
+        return clientRepository.findAllPageable(pageable);
     }
 }
