@@ -3,6 +3,8 @@ package com.brayanvanz.park_api.controllers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,5 +56,23 @@ public class ClientController {
         clientService.save(client);
 
         return ResponseEntity.status(201).body(ClientMapper.toDto(client));
+    }
+
+    @Operation(summary = "Finds a client", description = "Resource used to find a client by their ID. " +
+        "Requires a bearer token. Access restricted to ADMIN level users", 
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Resource localized successfully", 
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "Resource not available to CLIENT level users",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+            @ApiResponse(responseCode = "404", description = "Client not found",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+        }
+    )
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<ClientResponseDto> findById(@PathVariable Long id) {
+        Client client = clientService.findById(id);
+        return ResponseEntity.ok(ClientMapper.toDto(client));
     }
 }

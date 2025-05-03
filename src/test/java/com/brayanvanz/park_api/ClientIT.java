@@ -33,7 +33,6 @@ public class ClientIT {
             .expectStatus().isCreated()
             .expectBody(ClientResponseDto.class)
             .returnResult().getResponseBody();
-
         
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getId()).isNotNull();
@@ -53,7 +52,6 @@ public class ClientIT {
             .expectStatus().isForbidden()
             .expectBody(ErrorMessage.class)
             .returnResult().getResponseBody();
-
         
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
@@ -72,7 +70,6 @@ public class ClientIT {
             .expectBody(ErrorMessage.class)
             .returnResult().getResponseBody();
 
-        
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(409);
     }
@@ -89,7 +86,6 @@ public class ClientIT {
             .expectStatus().isEqualTo(422)
             .expectBody(ErrorMessage.class)
             .returnResult().getResponseBody();
-
         
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
@@ -104,7 +100,6 @@ public class ClientIT {
             .expectStatus().isEqualTo(422)
             .expectBody(ErrorMessage.class)
             .returnResult().getResponseBody();
-
         
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
@@ -119,9 +114,53 @@ public class ClientIT {
             .expectStatus().isEqualTo(422)
             .expectBody(ErrorMessage.class)
             .returnResult().getResponseBody();
-
         
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+    }
+
+    @Test
+    public void findById_ExistentId_ReturnClientStatus200() {
+        ClientResponseDto responseBody = webTestClient
+            .get()
+            .uri("/api/v1/clients/10")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "joey@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(ClientResponseDto.class)
+            .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getId()).isEqualTo(10);
+    }
+
+    @Test
+    public void findById_ExistentIdByClient_ReturnErrorMessage403() {
+        ErrorMessage responseBody = webTestClient
+            .get()
+            .uri("/api/v1/clients/0")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "tea@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isForbidden()
+            .expectBody(ErrorMessage.class)
+            .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
+    }
+
+    @Test
+    public void findById_NonExistentIdByAdmin_ReturnErrorMessage404() {
+        ErrorMessage responseBody = webTestClient
+            .get()
+            .uri("/api/v1/clients/0")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "joey@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isNotFound()
+            .expectBody(ErrorMessage.class)
+            .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
     }
 }
