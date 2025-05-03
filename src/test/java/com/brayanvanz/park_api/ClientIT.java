@@ -10,6 +10,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.brayanvanz.park_api.dtos.ClientResponseDto;
 import com.brayanvanz.park_api.dtos.ClientSaveDto;
+import com.brayanvanz.park_api.dtos.PageableDto;
 import com.brayanvanz.park_api.exceptions.ErrorMessage;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -162,5 +163,52 @@ public class ClientIT {
 
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    @SuppressWarnings("rawtypes")
+    public void findAll_PaginationAdmin_ReturnClientsStatus200() {
+        PageableDto responseBody = webTestClient
+            .get()
+            .uri("/api/v1/clients")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "joey@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(PageableDto.class)
+            .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(2);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(0);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(1);
+
+        responseBody = webTestClient
+            .get()
+            .uri("/api/v1/clients?size=1&page=1")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "joey@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(PageableDto.class)
+            .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+    }
+
+    @Test
+    public void findAll_PaginationClient_ReturnErrorMessage403() {
+        ErrorMessage responseBody = webTestClient
+            .get()
+            .uri("/api/v1/clients")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "tea@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isForbidden()
+            .expectBody(ErrorMessage.class)
+            .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
     }
 }
