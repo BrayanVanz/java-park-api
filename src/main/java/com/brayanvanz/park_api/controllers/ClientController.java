@@ -119,4 +119,21 @@ public class ClientController {
         Page<ClientProjection> clients = clientService.findAll(pageable);
         return ResponseEntity.ok(PageableMapper.toDto(clients));
     }
+
+    @Operation(summary = "Retrieves data from authenticated client", description = "Resource used to retrieve data from authenticated client. " +
+        "Requires a bearer token. Access restricted to CLIENT level users", 
+        security = @SecurityRequirement(name = "security"),
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Resource retrieved successfully", 
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "Resource not available to ADMIN level users",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+        }
+    )
+    @GetMapping("/details")
+    @PreAuthorize("hasAuthority('CLIENT')")
+    public ResponseEntity<ClientResponseDto> fetchDetails(@AuthenticationPrincipal JwtUserDetails userDetails) {
+        Client client = clientService.findByUserId(userDetails.getId());
+        return ResponseEntity.ok(ClientMapper.toDto(client));
+    }
 }
