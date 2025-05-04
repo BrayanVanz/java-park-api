@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class ParkingSpaceCreateDto {
+public class ParkingSpaceSaveDto {
 
     @NotBlank
     @Size(min = 4, max = 4)
