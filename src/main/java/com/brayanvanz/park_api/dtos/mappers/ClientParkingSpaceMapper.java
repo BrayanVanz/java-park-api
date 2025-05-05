@@ -10,7 +10,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ClientParkSpaceMapper {
+public class ClientParkingSpaceMapper {
 
     public static ClientParkingSpace toClientParkingSpace(ParkingSaveDto dto) {
         return new ModelMapper().map(dto, ClientParkingSpace.class);
