@@ -1,5 +1,6 @@
 package com.brayanvanz.park_api.entities;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -30,7 +31,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "client_parking_spaces")
 @EntityListeners(AuditingEntityListener.class)
-public class ClientParkingSpace {
+public class ClientParkingSpace implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,7 +59,7 @@ public class ClientParkingSpace {
     private LocalDateTime exitDate;
 
     @Column(columnDefinition = "decimal(7,2)")
-    private BigDecimal value;
+    private BigDecimal amount;
 
     @Column(columnDefinition = "decimal(7,2)")
     private BigDecimal discount;
