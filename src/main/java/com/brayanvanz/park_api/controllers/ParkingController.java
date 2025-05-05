@@ -5,6 +5,8 @@ import java.net.URI;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import com.brayanvanz.park_api.dtos.ParkingSaveDto;
 import com.brayanvanz.park_api.dtos.mappers.ClientParkingSpaceMapper;
 import com.brayanvanz.park_api.entities.ClientParkingSpace;
 import com.brayanvanz.park_api.exceptions.ErrorMessage;
+import com.brayanvanz.park_api.services.ClientParkingSpaceService;
 import com.brayanvanz.park_api.services.ParkingService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 public class ParkingController {
 
     private final ParkingService parkingService;
+    private final ClientParkingSpaceService clientParkingSpaceService;
     
     @Operation(summary = "Check-in operation", description = "Resource used to enter a vehicle into a parking space. " +
         "Requires a bearer token. Access restricted to ADMIN level users", 
@@ -65,5 +69,14 @@ public class ParkingController {
             .toUri();
         
         return ResponseEntity.created(location).body(responseDto);
+    }
+
+    @GetMapping("/check-in/{receipt}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT')")
+    public ResponseEntity<ParkingResponseDto> findByReceipt(@PathVariable String receipt) {
+        ClientParkingSpace clientParkingSpace = clientParkingSpaceService.findByReceipt(receipt);
+        ParkingResponseDto dto = ClientParkingSpaceMapper.tDto(clientParkingSpace);
+
+        return ResponseEntity.ok(dto);
     }
 }
