@@ -33,6 +33,6 @@ public class ParkingResponseDto {
     private LocalDateTime exitDate;
 
     private String parkingSpaceCode;
-    private BigDecimal value;
+    private BigDecimal amount;
     private BigDecimal discount;
 }

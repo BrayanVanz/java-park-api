@@ -26,4 +26,9 @@ public class ClientParkingSpaceService {
             () -> new EntityNotFoundException(String.format("Receipt %s not found or client already checked-out", receipt))
         );
     }
+
+    @Transactional(readOnly = true)
+    public long getTimesParkedAndLeft(String cpf) {
+        return clientParkingSpaceRepository.countByClientCpfAndExitDateIsNotNull(cpf);
+    }
 }

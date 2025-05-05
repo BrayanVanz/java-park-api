@@ -9,4 +9,6 @@ import com.brayanvanz.park_api.entities.ClientParkingSpace;
 public interface ClientParkingSpaceRepository extends JpaRepository<ClientParkingSpace, Long> {
 
     Optional<ClientParkingSpace> findByReceiptAndExitDateIsNull(String receipt);
+
+    long countByClientCpfAndExitDateIsNotNull(String cpf);
 }

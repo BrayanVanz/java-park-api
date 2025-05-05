@@ -135,7 +135,7 @@ public class ParkingsIT {
     public void findByReceipt_AdminRole_ReturnParkingResponseStatus200() {
         webTestClient
             .get()
-            .uri("/api/v1/parkings/check-in/{receipt}", "20230313-101300")
+            .uri("/api/v1/parkings/check-in/{receipt}", "20250313-101300")
             .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "joey@gmail.com", "123456"))
             .exchange()
             .expectStatus().isOk()
@@ -145,8 +145,8 @@ public class ParkingsIT {
             .jsonPath("model").isEqualTo("PALIO")
             .jsonPath("color").isEqualTo("GREEN")
             .jsonPath("clientCpf").isEqualTo("94636819063")
-            .jsonPath("receipt").isEqualTo("20230313-101300")
-            .jsonPath("entryDate").isEqualTo("2023-03-13 10:15:00")
+            .jsonPath("receipt").isEqualTo("20250313-101300")
+            .jsonPath("entryDate").isEqualTo("2025-03-13 10:15:00")
             .jsonPath("parkingSpaceCode").isEqualTo("A-01");
     }
 
@@ -154,7 +154,7 @@ public class ParkingsIT {
     public void findByReceipt_ClientRole_ReturnParkingResponseStatus200() {
         webTestClient
             .get()
-            .uri("/api/v1/parkings/check-in/{receipt}", "20230313-101300")
+            .uri("/api/v1/parkings/check-in/{receipt}", "20250313-101300")
             .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "tristan@gmail.com", "123456"))
             .exchange()
             .expectStatus().isOk()
@@ -164,8 +164,8 @@ public class ParkingsIT {
             .jsonPath("model").isEqualTo("PALIO")
             .jsonPath("color").isEqualTo("GREEN")
             .jsonPath("clientCpf").isEqualTo("94636819063")
-            .jsonPath("receipt").isEqualTo("20230313-101300")
-            .jsonPath("entryDate").isEqualTo("2023-03-13 10:15:00")
+            .jsonPath("receipt").isEqualTo("20250313-101300")
+            .jsonPath("entryDate").isEqualTo("2025-03-13 10:15:00")
             .jsonPath("parkingSpaceCode").isEqualTo("A-01");
     }
 
@@ -173,13 +173,63 @@ public class ParkingsIT {
     public void findByReceipt_NonExistentReceipt_ReturnErrorMessageStatus404() {
         webTestClient
             .get()
-            .uri("/api/v1/parkings/check-in/{receipt}", "20230313-999999")
+            .uri("/api/v1/parkings/check-in/{receipt}", "20250313-999999")
             .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "tristan@gmail.com", "123456"))
             .exchange()
             .expectStatus().isNotFound()
             .expectBody()
             .jsonPath("status").isEqualTo("404")
-            .jsonPath("path").isEqualTo("/api/v1/parkings/check-in/20230313-999999")
+            .jsonPath("path").isEqualTo("/api/v1/parkings/check-in/20250313-999999")
             .jsonPath("method").isEqualTo("GET");
+    }
+
+    @Test
+    public void checkOut_ExistentReceipt_ReturnStatus200() {
+        webTestClient
+            .put()
+            .uri("/api/v1/parkings/check-out/{receipt}", "20250313-101300")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "joey@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("plate").isEqualTo("FIT-1020")
+            .jsonPath("brand").isEqualTo("FIAT")
+            .jsonPath("model").isEqualTo("PALIO")
+            .jsonPath("color").isEqualTo("GREEN")
+            .jsonPath("clientCpf").isEqualTo("94636819063")
+            .jsonPath("receipt").isEqualTo("20250313-101300")
+            .jsonPath("entryDate").isEqualTo("2025-03-13 10:15:00")
+            .jsonPath("parkingSpaceCode").isEqualTo("A-01")
+            .jsonPath("exitDate").exists()
+            .jsonPath("amount").exists()
+            .jsonPath("discount").exists();
+    }
+
+    @Test
+    public void checkOut_NonExistentReceipt_ReturnErroMessageStatus404() {
+        webTestClient
+            .put()
+            .uri("/api/v1/parkings/check-out/{receipt}", "20250313-000000")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "joey@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isNotFound()
+            .expectBody()
+            .jsonPath("status").isEqualTo("404")
+            .jsonPath("path").isEqualTo("/api/v1/parkings/check-out/20250313-000000")
+            .jsonPath("method").isEqualTo("PUT");
+    }
+
+    @Test
+    public void checkOut_ClientRole_ReturnErroMessageStatus403() {
+        webTestClient
+            .put()
+            .uri("/api/v1/parkings/check-out/{receipt}", "20250313-101300")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "tea@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isForbidden()
+            .expectBody()
+            .jsonPath("status").isEqualTo("403")
+            .jsonPath("path").isEqualTo("/api/v1/parkings/check-out/20250313-101300")
+            .jsonPath("method").isEqualTo("PUT");
     }
 }

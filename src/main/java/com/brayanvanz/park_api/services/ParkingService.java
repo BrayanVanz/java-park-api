@@ -1,5 +1,6 @@
 package com.brayanvanz.park_api.services;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
@@ -32,6 +33,24 @@ public class ParkingService {
 
         clientParkingSpace.setEntryDate(LocalDateTime.now());
         clientParkingSpace.setReceipt(ParkingUtils.generateReceipt());
+
+        return clientParkingSpaceService.save(clientParkingSpace);
+    }
+
+    @Transactional
+    public ClientParkingSpace checkOut(String receipt) {
+        ClientParkingSpace clientParkingSpace = clientParkingSpaceService.findByReceipt(receipt);
+
+        LocalDateTime exitDate = LocalDateTime.now();
+        BigDecimal amount = ParkingUtils.calculateCost(clientParkingSpace.getEntryDate(), exitDate);
+        clientParkingSpace.setAmount(amount);
+
+        long times = clientParkingSpaceService.getTimesParkedAndLeft(clientParkingSpace.getClient().getCpf());
+        BigDecimal discount = ParkingUtils.calculateDiscount(amount, times);
+        clientParkingSpace.setDiscount(discount);
+
+        clientParkingSpace.setExitDate(exitDate);
+        clientParkingSpace.getParkingSpace().setStatus(ParkingSpaceStatus.AVAILABLE);
 
         return clientParkingSpaceService.save(clientParkingSpace);
     }
