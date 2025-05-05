@@ -1,5 +1,6 @@
 package com.brayanvanz.park_api;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import com.brayanvanz.park_api.dtos.PageableDto;
 import com.brayanvanz.park_api.dtos.ParkingSaveDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -231,5 +233,55 @@ public class ParkingsIT {
             .jsonPath("status").isEqualTo("403")
             .jsonPath("path").isEqualTo("/api/v1/parkings/check-out/20250313-101300")
             .jsonPath("method").isEqualTo("PUT");
+    }
+
+    @Test
+    @SuppressWarnings({ "rawtypes", "null" })
+    public void findAllParkingsByCpf_ClientCpf_ReturnStatus200() {
+        PageableDto responseBody = webTestClient
+            .get()
+            .uri("/api/v1/parkings/cpf/{cpf}?size=1&page=0", "94636819063")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "joey@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(PageableDto.class)
+            .returnResult().getResponseBody();
+    
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(0);
+        Assertions.assertThat(responseBody.getSize()).isEqualTo(1);
+        
+        responseBody = webTestClient
+            .get()
+            .uri("/api/v1/parkings/cpf/{cpf}?size=1&page=1", "94636819063")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "joey@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(PageableDto.class)
+            .returnResult().getResponseBody();
+    
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getSize()).isEqualTo(1);
+    }
+    
+    @Test
+    public void findAllParkingsByCpf_ClientRole_ReturnErrorMessageStatus403() {
+        webTestClient
+            .get()
+            .uri("/api/v1/parkings/cpf/{cpf}", "94636819063")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "tea@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isForbidden()
+            .expectBody()
+            .jsonPath("status").isEqualTo("403")
+            .jsonPath("path").isEqualTo("/api/v1/parkings/cpf/94636819063")
+            .jsonPath("method").isEqualTo("GET");
     }
 }

@@ -1,11 +1,14 @@
 package com.brayanvanz.park_api.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.brayanvanz.park_api.entities.ClientParkingSpace;
 import com.brayanvanz.park_api.exceptions.EntityNotFoundException;
 import com.brayanvanz.park_api.repositories.ClientParkingSpaceRepository;
+import com.brayanvanz.park_api.repositories.projections.ClientParkingSpaceProjection;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,5 +33,10 @@ public class ClientParkingSpaceService {
     @Transactional(readOnly = true)
     public long getTimesParkedAndLeft(String cpf) {
         return clientParkingSpaceRepository.countByClientCpfAndExitDateIsNotNull(cpf);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ClientParkingSpaceProjection> findAllByClientCpf(String cpf, Pageable pageable) {
+        return clientParkingSpaceRepository.findAllByClientCpf(cpf, pageable);
     }
 }

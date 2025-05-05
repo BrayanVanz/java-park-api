@@ -2,6 +2,10 @@ package com.brayanvanz.park_api.controllers;
 
 import java.net.URI;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,11 +18,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.brayanvanz.park_api.dtos.PageableDto;
 import com.brayanvanz.park_api.dtos.ParkingResponseDto;
 import com.brayanvanz.park_api.dtos.ParkingSaveDto;
 import com.brayanvanz.park_api.dtos.mappers.ClientParkingSpaceMapper;
+import com.brayanvanz.park_api.dtos.mappers.PageableMapper;
 import com.brayanvanz.park_api.entities.ClientParkingSpace;
 import com.brayanvanz.park_api.exceptions.ErrorMessage;
+import com.brayanvanz.park_api.repositories.projections.ClientParkingSpaceProjection;
 import com.brayanvanz.park_api.services.ClientParkingSpaceService;
 import com.brayanvanz.park_api.services.ParkingService;
 
@@ -119,6 +126,35 @@ public class ParkingController {
     public ResponseEntity<ParkingResponseDto> checkOut(@PathVariable String receipt) {
         ClientParkingSpace clientParkingSpace = parkingService.checkOut(receipt);
         ParkingResponseDto dto = ClientParkingSpaceMapper.tDto(clientParkingSpace);
+
+        return ResponseEntity.ok(dto);
+    }
+    
+    @Operation(summary = "Find all parkings by CPF", description = "Resource used to retrieve all parkings from a client by their CPF. " +
+        "Requires a bearer token.", 
+        security = @SecurityRequirement(name = "security"),
+        parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "cpf", description = "Client CPF", required = true),
+            @Parameter(in = ParameterIn.PATH, name = "page", description = "Page returned", required = true, 
+                content = @Content(schema = @Schema(type = "integer", defaultValue = "0"))),
+            @Parameter(in = ParameterIn.PATH, name = "size", description = "Total elements per page", required = true,
+                content = @Content(schema = @Schema(type = "integer", defaultValue = "5"))),
+            @Parameter(in = ParameterIn.PATH, name = "sort", description = "Sorting type 'entryDate,asc'", required = true, 
+                content = @Content(schema = @Schema(type = "string", defaultValue = "entryDate,asc"))),
+        },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Resource retrieved successfully", 
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = PageableDto.class))),
+            @ApiResponse(responseCode = "403", description = "Resource not available to CLIENT level users",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+        }
+    )
+    @GetMapping("/cpf/{cpf}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<PageableDto<ClientParkingSpaceProjection>> findAllParkingsByCpf(@PathVariable String cpf,
+        @PageableDefault(size = 5, sort = "entryDate", direction = Direction.ASC) Pageable pageable) {
+        Page<ClientParkingSpaceProjection> projection = clientParkingSpaceService.findAllByClientCpf(cpf, pageable);
+        PageableDto<ClientParkingSpaceProjection> dto = PageableMapper.toDto(projection);
 
         return ResponseEntity.ok(dto);
     }
