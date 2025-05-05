@@ -284,4 +284,54 @@ public class ParkingsIT {
             .jsonPath("path").isEqualTo("/api/v1/parkings/cpf/94636819063")
             .jsonPath("method").isEqualTo("GET");
     }
+
+    @Test
+    @SuppressWarnings({ "rawtypes", "null" })
+    public void findAllParkingsClient_CurrentClient_ReturnStatus200() {
+        PageableDto responseBody = webTestClient
+            .get()
+            .uri("/api/v1/parkings?size=1&page=0")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "tristan@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(PageableDto.class)
+            .returnResult().getResponseBody();
+    
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(0);
+        Assertions.assertThat(responseBody.getSize()).isEqualTo(1);
+        
+        responseBody = webTestClient
+            .get()
+            .uri("/api/v1/parkings?size=1&page=1")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "tristan@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(PageableDto.class)
+            .returnResult().getResponseBody();
+    
+        
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2);
+        Assertions.assertThat(responseBody.getNumber()).isEqualTo(1);
+        Assertions.assertThat(responseBody.getSize()).isEqualTo(1);
+    }
+
+    @Test
+    public void findAllParkingsClient_AdminRole_ReturnErrorMessageStatus403() {
+        webTestClient
+            .get()
+            .uri("/api/v1/parkings")
+            .headers(JwtAuthentication.getHeaderAuthorization(webTestClient, "joey@gmail.com", "123456"))
+            .exchange()
+            .expectStatus().isForbidden()
+            .expectBody()
+            .jsonPath("status").isEqualTo("403")
+            .jsonPath("path").isEqualTo("/api/v1/parkings")
+            .jsonPath("method").isEqualTo("GET");
+    }
 }
